@@ -207,7 +207,7 @@ export function showTitle(ctx) {
           h('button', { class: 'link-btn', type: 'button', onclick: () => how.showModal() }, 'How scoring works')),
         lineDiagram()),
       h('footer', { class: 'foot' },
-        'Map data © OpenStreetMap contributors, tiles © CARTO. Travel times are model estimates. Not affiliated with any transport operator.')),
+        'Map data © OpenStreetMap contributors, Esri imagery on the label-free map. Travel times are model estimates. Not affiliated with any transport operator.')),
     how
   );
 

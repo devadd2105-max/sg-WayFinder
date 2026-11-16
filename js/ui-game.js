@@ -241,9 +241,17 @@ export function playRound(ctx, game, round) {
       if (next === 'plan') {
         if (!plan) plan = new Plan({ start: guess, destination, budget: round.budget, scenario });
         showStations(mode === 'rail');
-        map.fitBounds([guess, destination], 70, 16);
         redrawRoute();
         updatePlanUI();
+        // The panel changes height once it is filled in, so frame the map after layout settles.
+        map.invalidateSize();
+        map.fitBounds([guess, destination], 70, 16);
+        requestAnimationFrame(() => {
+          if (stage === 'plan' && !plan.legs.length) {
+            map.invalidateSize();
+            map.fitBounds([guess, destination], 70, 16);
+          }
+        });
       }
       if (next === 'predict') {
         showStations(false);

@@ -1,16 +1,21 @@
 // A small slippy map: raster tiles, pan, zoom, markers, lines and circles.
-// No dependencies. Tiles come from CARTO basemaps (OpenStreetMap data).
+// No dependencies. Labelled maps use OpenStreetMap tiles; label-free maps use Esri World Imagery. Neither needs a key.
 
 import { SG_BOUNDS, SG_CENTER, clamp } from './geo.js';
 
 const TILE = 256;
 
-export const TILE_STYLES = {
-  labels: 'rastertiles/voyager',
-  plain: 'rastertiles/voyager_nolabels',
+const TILE_URLS = {
+  labels: (z, x, y) => `https://tile.openstreetmap.org/${z}/${x}/${y}.png`,
+  plain: (z, x, y) => `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${y}/${x}`,
 };
 
-export const ATTRIBUTION = '© OpenStreetMap contributors © CARTO';
+export const TILE_STYLES = { labels: 'labels', plain: 'plain' };
+
+export const ATTRIBUTION = {
+  labels: '© OpenStreetMap contributors',
+  plain: 'Imagery © Esri, Maxar, Earthstar Geographics',
+};
 
 const worldSize = (z) => TILE * 2 ** z;
 
@@ -74,7 +79,8 @@ export class SlippyMap {
     if (attribution) {
       const a = document.createElement('div');
       a.className = 'slippy-attribution';
-      a.textContent = ATTRIBUTION;
+      this.attributionEl = a;
+      a.textContent = ATTRIBUTION[this.style] ?? ATTRIBUTION.labels;
       container.append(a);
     }
     if (interactive && controls) this.#buildControls();
@@ -123,6 +129,7 @@ export class SlippyMap {
   setStyle(style) {
     if (style === this.style) return;
     this.style = style;
+    if (this.attributionEl) this.attributionEl.textContent = ATTRIBUTION[style] ?? ATTRIBUTION.labels;
     for (const t of this.tiles.values()) t.remove();
     this.tiles.clear();
     this.render();
@@ -456,9 +463,7 @@ export class SlippyMap {
           img.draggable = false;
           img.decoding = 'async';
           img.addEventListener('load', () => img.classList.add('ready'));
-          img.src = `https://${'abcd'[(x + y) % 4]}.basemaps.cartocdn.com/${TILE_STYLES[this.style]}/${z}/${x}/${y}${
-            window.devicePixelRatio > 1 ? '@2x' : ''
-          }.png`;
+          img.src = TILE_URLS[this.style](z, x, y);
           this.tilesEl.append(img);
           this.tiles.set(key, img);
         }

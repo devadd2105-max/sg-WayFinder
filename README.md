@@ -48,7 +48,7 @@ npm test                      # 19 unit tests (node:test): geo, rng, model, scor
 
 ## Attribution
 
-Map tiles © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors © [CARTO](https://carto.com/attributions). Routing by the OSRM demo servers at routing.openstreetmap.de. Fonts from Google Fonts. Street View © Google.
+Map tiles © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors (labelled maps) and Esri World Imagery (label-free maps); no key needed, but both are public tile servers meant for light use. Routing by the OSRM demo servers at routing.openstreetmap.de. Fonts from Google Fonts. Street View © Google.
 
 ## Licence
 
