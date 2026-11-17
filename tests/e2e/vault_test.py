@@ -1,4 +1,4 @@
-import smoke_helpers as H
+import os, smoke_helpers as H
 from playwright.sync_api import sync_playwright
 FAKE = """
 window.google={maps:{StreetViewPanorama:function(){},StreetViewService:function(){this.getPanorama=function(_a,cb){cb({},'OK')}}}};
@@ -16,7 +16,7 @@ with sync_playwright() as p:
     pg.click(".drawer summary")
     pg.fill("#vault-pw","wrong"); pg.click("text=Unlock"); pg.wait_for_timeout(1500)
     print("wrong ->", pg.locator(".status").inner_text(), "| saved:", pg.evaluate("localStorage.length"))
-    pg.fill("#vault-pw","deva2009"); pg.click("text=Unlock"); pg.wait_for_timeout(2500)
+    pg.fill("#vault-pw", os.environ["VAULT_PASSWORD"]); pg.click("text=Unlock"); pg.wait_for_timeout(2500)
     print("right ->", pg.locator(".status").inner_text())
     print("key requested from Google with real key:", any("key=AIza" in u for u in seen))
     pg.screenshot(path="/tmp/shots/vault.png")
