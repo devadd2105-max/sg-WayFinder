@@ -21,6 +21,8 @@ Serve it over `http://`; opening `index.html` as a `file://` URL will not work w
 
 ### Street View (optional Google Maps key)
 
+The hosted game bundles an encrypted Maps key. Entering the game password on the title screen unlocks real Street View. Only ciphertext is in the repo (`js/data/vault-data.js`), but a static site can't truly hide a key, so the key itself must be restricted by HTTP referrer and quota-capped in Google Cloud. To use your own key instead, follow the steps below.
+
 Without a key the game runs in **practice mode**, using a label-free aerial crop of the start area.
 For real Street View:
 
