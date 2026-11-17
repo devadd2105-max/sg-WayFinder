@@ -4,6 +4,7 @@ import { h, clear, icon, toast } from './dom.js';
 import { DIFFICULTIES } from './model.js';
 import { saveSettings } from './store.js';
 import { loadGoogleMaps, testKey } from './streetview.js';
+import { hasVault, unlockKey } from './vault.js';
 import { bestScore } from './store.js';
 import { dailySeed } from './rng.js';
 
@@ -121,9 +122,39 @@ function keyBox(ctx) {
     },
   }, 'Remove');
 
+  const pwInput = h('input', {
+    class: 'text-input', type: 'password', id: 'vault-pw', autocomplete: 'off', placeholder: 'Full game password',
+  });
+  const unlock = h('button', {
+    class: 'btn btn-quiet', type: 'button',
+    onclick: async () => {
+      const pw = pwInput.value;
+      if (!pw) return;
+      unlock.disabled = true;
+      setStatus('Unlocking…');
+      try {
+        const key = await unlockKey(pw);
+        await testKey(key);
+        ctx.settings = saveSettings({ mapsKey: key });
+        pwInput.value = '';
+        input.value = '';
+        setStatus('Unlocked. Rounds will use real Street View.', 'ok');
+      } catch (err) {
+        setStatus(err.message === 'wrong-password' ? 'That password is not right.' : err.message, 'bad');
+      } finally {
+        unlock.disabled = false;
+      }
+    },
+  }, 'Unlock');
+  pwInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') unlock.click(); });
+
   return h('details', { class: 'drawer' },
     h('summary', {}, icon('key', 18), h('span', {}, 'Real Street View')),
     h('div', { class: 'drawer-body' },
+      hasVault() && h('div', { class: 'vault' },
+        h('label', { class: 'field-label', for: 'vault-pw' }, 'Full game password'),
+        h('div', { class: 'key-row' }, pwInput, unlock),
+        h('p', { class: 'fine' }, 'Enter the password to play with real Street View. Or use your own key below.')),
       h('p', { class: 'fine' },
         'Street View needs your own Google Maps key (in Google Cloud: create a key, enable the Maps JavaScript API, and restrict it to this site). The key stays in this browser and goes only to Google.'),
       h('label', { class: 'field-label', for: 'maps-key' }, 'API key'),
